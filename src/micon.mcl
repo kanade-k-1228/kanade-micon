@@ -1,0 +1,8 @@
+uart = uart(uart,UART);
+uart.tx => fpga.pin1;
+uart.rx <= fpga.pin2;
+
+gpio = gpio(gpio,GPIO);
+gpio.io <=> fpga.user_led;
+
+cpu.irq5 <= fpga.pin11;

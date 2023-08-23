@@ -1,0 +1,94 @@
+###############################################################################
+#
+# TinyFPGA BX constraint file (.pcf)
+#
+###############################################################################
+#
+# Copyright (c) 2018, Luke Valenty
+# All rights reserved.
+# 
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+# 
+# 1. Redistributions of source code must retain the above copyright notice, this
+#    list of conditions and the following disclaimer.
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+#    this list of conditions and the following disclaimer in the documentation
+#    and/or other materials provided with the distribution.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+# ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+# WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+# LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+# (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# The views and conclusions contained in the software and documentation are those
+# of the authors and should not be interpreted as representing official policies,
+# either expressed or implied, of the <project name> project. 
+#
+###############################################################################
+
+####
+# TinyFPGA BX information: https://github.com/tinyfpga/TinyFPGA-BX/
+####
+
+# Left side of board
+set_io fpga_pin1 A2
+set_io fpga_pin2 A1
+set_io fpga_pin3 B1
+set_io fpga_pin4 C2
+set_io fpga_pin5 C1
+set_io fpga_pin6 D2
+set_io fpga_pin7 D1
+set_io fpga_pin8 E2
+set_io fpga_pin9 E1
+set_io fpga_pin10 G2
+set_io fpga_pin11 H1
+set_io fpga_pin12 J1
+set_io fpga_pin13 H2
+
+# Right side of board
+set_io fpga_pin14 H9
+set_io fpga_pin15 D9
+set_io fpga_pin16 D8
+set_io fpga_pin17 C9
+set_io fpga_pin18 A9
+set_io fpga_pin19 B8
+set_io fpga_pin20 A8
+set_io fpga_pin21 B7
+set_io fpga_pin22 A7
+set_io fpga_pin23 B6
+set_io fpga_pin24 A6
+
+# SPI flash interface on bottom of board
+set_io fpga_flash_csb F7
+set_io fpga_flash_clk G7
+set_io fpga_flash_io0 G6
+set_io fpga_flash_io1 H7
+set_io fpga_flash_io2 H4
+set_io fpga_flash_io3 J8
+
+# General purpose pins on bottom of board
+set_io fpga_pin25 G1
+set_io fpga_pin26 J3
+set_io fpga_pin27 J4
+set_io fpga_pin28 G9
+set_io fpga_pin29 J9
+set_io fpga_pin30 E8
+set_io fpga_pin31 J2
+
+# LED
+set_io fpga_user_led B3
+
+# USB
+set_io fpga_usb_pu A3
+set_io fpga_usb_p B4
+set_io fpga_usb_n A4
+
+# 16MHz clock
+set_io fpga_clk B2
