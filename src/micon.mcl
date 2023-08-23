@@ -1,8 +1,35 @@
-uart = uart(uart,UART);
-uart.tx => fpga.pin1;
-uart.rx <= fpga.pin2;
+cpu.irq5 <= fpga.pin11;
+
+serial = uart(uart,UART);
+serial.tx => fpga.pin1;
+serial.rx <= fpga.pin2;
 
 gpio = gpio(gpio,GPIO);
 gpio.io <=> fpga.user_led;
 
-cpu.irq5 <= fpga.pin11;
+square1  = oscilator(osc_square,  Oscilator);
+square2  = oscilator(osc_square,  Oscilator);
+square3  = oscilator(osc_square,  Oscilator);
+sawtooth = oscilator(osc_sawtooth,Oscilator);
+triangle = oscilator(osc_triangle,Oscilator);
+
+mixier.ch0 <=(8)= square1.out;
+mixier.ch1 <=(8)= square2.out;
+mixier.ch2 <=(8)= square3.out;
+mixier.ch3 <=(8)= sawtooth.out;
+mixier.ch4 <=(8)= triangle.out;
+
+mixier = mixier(mixier,Mixier);
+
+dac.analog <=(12)= mixier.out;
+
+sampling = counter(counter,Counter);
+
+dac.sample <= sampling.overflow;
+
+dac = spidac(spidac,SPIDAC);
+
+dac.cs => fpga.pin24;
+dac.scl => fpga.pin23;
+dac.sdi => fpga.pin22;
+dac.ldac => fpga.pin21;

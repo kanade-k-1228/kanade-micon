@@ -5,7 +5,10 @@ SIMU_HARD = .common/simulation/*.v simulation/*.v
 SIMU_SOFT = .common/*.cpp .packages/*/*.cpp firmware/*.cpp simulation/*.cpp
 
 upload: hardware software
-	tinyprog -p .build/hardware.bin -u .build/software.bin
+#	tinyprog -p .build/hardware.bin -u .build/software.bin
+	powershell.exe -c \
+	"tinyprog -p \$$env:WSLHome\synthesizer\src\.build\hardware.bin \
+	          -u \$$env:WSLHome\synthesizer\src\.build\software.bin"
 
 gen: hardware/hardware.v firmware/firmware.hpp firmware/firmware.cpp
 	micon read -m micon.mcl
@@ -26,7 +29,7 @@ hardware: .build/hardware.bin
 	icepack $^ $@
 
 software: .build/software.objdump .build/software.nm .build/software.bin
-.build/software.elf: .common/start.S $(SOFTWARE)
+.build/software.elf: .common/start.S $(SOFTWARE) firmware/firmware.hpp
 	$(CROSS)g++ -march=rv32imc -mabi=ilp32 -nostartfiles \
 	        -Wl,-Bstatic,-T,.common/sections.lds,--strip-debug,-Map=.build/software.map,--cref \
 			-O3 -ffreestanding -nostdlib -I .common -I firmware -I .packages -o $@ $^
