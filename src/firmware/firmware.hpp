@@ -1,12 +1,12 @@
 #include "cpu.hpp"
 #include "spirom/ROM_CFG.hpp"
 /* includes */
-#include "uart/UART.hpp"
-#include "gpio/GPIO.hpp"
-#include "oscilator/Oscilator.hpp"
-#include "mixier/Mixier.hpp"
 #include "counter/Counter.hpp"
+#include "gpio/GPIO.hpp"
+#include "mixier/Mixier.hpp"
+#include "oscilator/Oscilator.hpp"
 #include "spidac/SPIDAC.hpp"
+#include "uart/UART.hpp"
 /* end */
 
 extern ROM_CFG rom_cfg;
