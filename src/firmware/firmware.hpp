@@ -3,11 +3,11 @@
 /* includes */
 #include "counter/Counter.hpp"
 #include "gpio/GPIO.hpp"
-#include "mixier/Mixier.hpp"
-#include "oscilator/Oscilator.hpp"
+#include "music/Mixier.hpp"
+#include "music/Oscilator.hpp"
+#include "music/SPIDAC.hpp"
 #include "pwm/PWM.hpp"
 #include "selector/Selector.hpp"
-#include "spidac/SPIDAC.hpp"
 #include "uart/UART.hpp"
 /* end */
 

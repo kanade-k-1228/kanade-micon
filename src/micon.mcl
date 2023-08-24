@@ -13,11 +13,11 @@ pwm.out => sel.in1;
 sel = selector(selector,Selector);
 sel.out => fpga.user_led;
 
-square1  = oscilator(osc_square,  Oscilator);
-square2  = oscilator(osc_square,  Oscilator);
-square3  = oscilator(osc_square,  Oscilator);
-sawtooth = oscilator(osc_sawtooth,Oscilator);
-triangle = oscilator(osc_triangle,Oscilator);
+square1  = music(osc_square,  Oscilator);
+square2  = music(osc_square,  Oscilator);
+square3  = music(osc_square,  Oscilator);
+sawtooth = music(osc_sawtooth,Oscilator);
+triangle = music(osc_triangle,Oscilator);
 
 mixier.ch0 <=(8)= square1.out;
 mixier.ch1 <=(8)= square2.out;
@@ -25,7 +25,7 @@ mixier.ch2 <=(8)= square3.out;
 mixier.ch3 <=(8)= sawtooth.out;
 mixier.ch4 <=(8)= triangle.out;
 
-mixier = mixier(mixier,Mixier);
+mixier = music(mixier,Mixier);
 
 dac.analog <=(12)= mixier.out;
 
@@ -33,7 +33,7 @@ sampling = counter(counter,Counter);
 
 dac.sample <= sampling.overflow;
 
-dac = spidac(spidac,SPIDAC);
+dac = music(spidac,SPIDAC);
 
 dac.cs => fpga.pin24;
 dac.scl => fpga.pin23;

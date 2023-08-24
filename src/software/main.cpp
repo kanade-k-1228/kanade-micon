@@ -1,5 +1,5 @@
 #include "firmware.hpp"
-#include "player/rockman_dr_wily.h"
+#include "music/rockman_dr_wily.h"
 
 static const int N_CH = 5;
 
