@@ -7,10 +7,10 @@ module hardware (
     inout  fpga_flash_io2,
     inout  fpga_flash_io3,
     /* iopin */
-    inout  fpga_user_led,
     input  fpga_pin11,
     input  fpga_pin2,
     output fpga_pin1,
+    output fpga_user_led,
     output fpga_pin24,
     output fpga_pin23,
     output fpga_pin22,
@@ -19,7 +19,8 @@ module hardware (
 );
 
   /* iopin_assign */
-  assign fpga_pin1  = serial_tx;
+  assign fpga_pin1 = serial_tx;
+  assign fpga_user_led = sel_out;
   assign fpga_pin24 = dac_cs;
   assign fpga_pin23 = dac_scl;
   assign fpga_pin22 = dac_sdi;
@@ -92,10 +93,10 @@ module hardware (
   wire [31:0] mem_wdata;
   wire [31:0] mem_rdata;
   assign mem_ready = |{ram_ready, rom_ready, rom_cfg_ready,  /* mem_ready */
-      serial_ready,gpio_ready,square1_ready,square2_ready,square3_ready,sawtooth_ready,triangle_ready,mixier_ready,sampling_ready,dac_ready
+      serial_ready,gpio_ready,pwm_ready,sel_ready,square1_ready,square2_ready,square3_ready,sawtooth_ready,triangle_ready,mixier_ready,sampling_ready,dac_ready
       /* end */};
   assign mem_rdata = ram_ready ? ram_rdata : rom_ready ? rom_rdata : rom_cfg_ready ? rom_cfg_rdata /* mem_rdata */
-      : serial_ready ? serial_rdata : gpio_ready ? gpio_rdata : square1_ready ? square1_rdata : square2_ready ? square2_rdata : square3_ready ? square3_rdata : sawtooth_ready ? sawtooth_rdata : triangle_ready ? triangle_rdata : mixier_ready ? mixier_rdata : sampling_ready ? sampling_rdata : dac_ready ? dac_rdata
+      : serial_ready ? serial_rdata : gpio_ready ? gpio_rdata : pwm_ready ? pwm_rdata : sel_ready ? sel_rdata : square1_ready ? square1_rdata : square2_ready ? square2_rdata : square3_ready ? square3_rdata : sawtooth_ready ? sawtooth_rdata : triangle_ready ? triangle_rdata : mixier_ready ? mixier_rdata : sampling_ready ? sampling_rdata : dac_ready ? dac_rdata
       /* end */ : 32'b0;
 
   ///////////////////////////////////
@@ -223,26 +224,52 @@ module hardware (
       .valid(gpio_valid),
       .ready(gpio_ready),
       .wstrb(gpio_valid ? mem_wstrb : 4'b0),
-      .addr (mem_addr),
+      .addr(mem_addr),
       .wdata(mem_wdata),
       .rdata(gpio_rdata),
-      .io_iosel(gpio_io_iosel),
-      .io_in   (gpio_io_in),
-      .io_out  (gpio_io_out)
+      .io_out(gpio_io_out)
   );
   wire gpio_sel = mem_addr[31:24] == 8'h04;
   wire gpio_valid = mem_valid && gpio_sel;
   wire gpio_ready;
   wire [31:0] gpio_rdata;
-  wire gpio_io_iosel;
-  wire gpio_io_in;
   wire gpio_io_out;
-  tristate gpio_io_iobuf (
-      .pin  (fpga_user_led),
-      .iosel(gpio_io_iosel),
-      .in   (gpio_io_in),
-      .out  (gpio_io_out)
+
+  pwm pwm (
+      .clk(clk),
+      .resetn(resetn),
+      .valid(pwm_valid),
+      .ready(pwm_ready),
+      .wstrb(pwm_valid ? mem_wstrb : 4'b0),
+      .addr(mem_addr),
+      .wdata(mem_wdata),
+      .rdata(pwm_rdata),
+      .out(pwm_out)
   );
+  wire pwm_sel = mem_addr[31:24] == 8'h05;
+  wire pwm_valid = mem_valid && pwm_sel;
+  wire pwm_ready;
+  wire [31:0] pwm_rdata;
+  wire pwm_out;
+
+  selector sel (
+      .clk(clk),
+      .resetn(resetn),
+      .valid(sel_valid),
+      .ready(sel_ready),
+      .wstrb(sel_valid ? mem_wstrb : 4'b0),
+      .addr(mem_addr),
+      .wdata(mem_wdata),
+      .rdata(sel_rdata),
+      .in0(gpio_io_out),
+      .in1(pwm_out),
+      .out(sel_out)
+  );
+  wire sel_sel = mem_addr[31:24] == 8'h06;
+  wire sel_valid = mem_valid && sel_sel;
+  wire sel_ready;
+  wire [31:0] sel_rdata;
+  wire sel_out;
 
   osc_square square1 (
       .clk(clk),
@@ -255,7 +282,7 @@ module hardware (
       .rdata(square1_rdata),
       .out(square1_out)
   );
-  wire square1_sel = mem_addr[31:24] == 8'h05;
+  wire square1_sel = mem_addr[31:24] == 8'h07;
   wire square1_valid = mem_valid && square1_sel;
   wire square1_ready;
   wire [31:0] square1_rdata;
@@ -272,7 +299,7 @@ module hardware (
       .rdata(square2_rdata),
       .out(square2_out)
   );
-  wire square2_sel = mem_addr[31:24] == 8'h06;
+  wire square2_sel = mem_addr[31:24] == 8'h08;
   wire square2_valid = mem_valid && square2_sel;
   wire square2_ready;
   wire [31:0] square2_rdata;
@@ -289,7 +316,7 @@ module hardware (
       .rdata(square3_rdata),
       .out(square3_out)
   );
-  wire square3_sel = mem_addr[31:24] == 8'h07;
+  wire square3_sel = mem_addr[31:24] == 8'h09;
   wire square3_valid = mem_valid && square3_sel;
   wire square3_ready;
   wire [31:0] square3_rdata;
@@ -306,7 +333,7 @@ module hardware (
       .rdata(sawtooth_rdata),
       .out(sawtooth_out)
   );
-  wire sawtooth_sel = mem_addr[31:24] == 8'h08;
+  wire sawtooth_sel = mem_addr[31:24] == 8'h0A;
   wire sawtooth_valid = mem_valid && sawtooth_sel;
   wire sawtooth_ready;
   wire [31:0] sawtooth_rdata;
@@ -323,7 +350,7 @@ module hardware (
       .rdata(triangle_rdata),
       .out(triangle_out)
   );
-  wire triangle_sel = mem_addr[31:24] == 8'h09;
+  wire triangle_sel = mem_addr[31:24] == 8'h0B;
   wire triangle_valid = mem_valid && triangle_sel;
   wire triangle_ready;
   wire [31:0] triangle_rdata;
@@ -345,7 +372,7 @@ module hardware (
       .ch4(triangle_out),
       .out(mixier_out)
   );
-  wire mixier_sel = mem_addr[31:24] == 8'h0A;
+  wire mixier_sel = mem_addr[31:24] == 8'h0C;
   wire mixier_valid = mem_valid && mixier_sel;
   wire mixier_ready;
   wire [31:0] mixier_rdata;
@@ -362,7 +389,7 @@ module hardware (
       .rdata(sampling_rdata),
       .overflow(sampling_overflow)
   );
-  wire sampling_sel = mem_addr[31:24] == 8'h0B;
+  wire sampling_sel = mem_addr[31:24] == 8'h0D;
   wire sampling_valid = mem_valid && sampling_sel;
   wire sampling_ready;
   wire [31:0] sampling_rdata;
@@ -384,7 +411,7 @@ module hardware (
       .sdi(dac_sdi),
       .ldac(dac_ldac)
   );
-  wire dac_sel = mem_addr[31:24] == 8'h0C;
+  wire dac_sel = mem_addr[31:24] == 8'h0E;
   wire dac_valid = mem_valid && dac_sel;
   wire dac_ready;
   wire [31:0] dac_rdata;

@@ -5,6 +5,8 @@
 #include "gpio/GPIO.hpp"
 #include "mixier/Mixier.hpp"
 #include "oscilator/Oscilator.hpp"
+#include "pwm/PWM.hpp"
+#include "selector/Selector.hpp"
 #include "spidac/SPIDAC.hpp"
 #include "uart/UART.hpp"
 /* end */
@@ -13,6 +15,8 @@ extern ROM_CFG rom_cfg;
 /* declarations */
 extern UART serial;
 extern GPIO gpio;
+extern PWM pwm;
+extern Selector sel;
 extern Oscilator square1;
 extern Oscilator square2;
 extern Oscilator square3;

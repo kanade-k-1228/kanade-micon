@@ -5,7 +5,13 @@ serial.tx => fpga.pin1;
 serial.rx <= fpga.pin2;
 
 gpio = gpio(gpio,GPIO);
-gpio.io <=> fpga.user_led;
+gpio.io_out => sel.in0;
+
+pwm = pwm(pwm,PWM);
+pwm.out => sel.in1;
+
+sel = selector(selector,Selector);
+sel.out => fpga.user_led;
 
 square1  = oscilator(osc_square,  Oscilator);
 square2  = oscilator(osc_square,  Oscilator);

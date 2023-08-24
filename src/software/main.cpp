@@ -170,18 +170,29 @@ void init() {
 void loop() {
   char cmd;
   while(true) {
-    serial << "[a] Blink LED" << UART::endl
-           << "[b] Sownd" << UART::endl
-           << "[c] Piano" << UART::endl
-           << "[d] Play Rockman" << UART::endl;
+    serial << "Select:\n"
+              " [a] Blink LED (GPIO)\n"
+              " [b] Blink LED (PWM)\n"
+              " [c] Sownd\n"
+              " [d] Piano\n"
+              " [e] Play Rockman\n";
     serial >> cmd;
     if(cmd == 'a') {
-      serial << "=== Blink LED ===" << UART::endl;
+      serial << "=== Blink LED (GPIO) ===\n";
+      sel.select(0);
       gpio_blink(gpio);
-      serial << "=== end ===" << UART::endl;
+      sel.unselect();
+      serial << "=== end ===\n";
     }
     if(cmd == 'b') {
-      serial << "=== Play Sownd ===" << UART::endl;
+      serial << "=== Blink LED (PWM) ===\n";
+      sel.select(1);
+      pwm_blink(pwm);
+      sel.unselect();
+      serial << "=== end ===\n";
+    }
+    if(cmd == 'c') {
+      serial << "=== Play Sownd ===\n";
       for(int i = 0; i < N_CH; ++i) {
         sownd_play(i, 48);
         delayMs(500);
@@ -193,18 +204,17 @@ void loop() {
       arpeggio(53, 57, 60, tempo);
       arpeggio(55, 59, 62, tempo);
       arpeggio(55, 60, 64, tempo);
-      serial << "=== end ===" << UART::endl;
-    }
-    if(cmd == 'c') {
-      serial << "=== Piano (exit: \\n) ===" << UART::endl;
-      piano();
-      serial << UART::endl
-             << "=== end ===" << UART::endl;
+      serial << "=== end ===\n";
     }
     if(cmd == 'd') {
-      serial << "=== Play Music ===" << UART::endl;
+      serial << "=== Piano (exit: \\n) ===\n";
+      piano();
+      serial << "\n=== end ===\n";
+    }
+    if(cmd == 'e') {
+      serial << "=== Play Music ===\n";
       play_rockman();
-      serial << "=== end ===" << UART::endl;
+      serial << "=== end ===\n";
     }
   }
 }

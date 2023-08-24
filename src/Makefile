@@ -7,8 +7,8 @@ SIMU_SOFT = .common/*.cpp .packages/*/*.cpp firmware/*.cpp simulation/*.cpp
 upload: hardware software
 #	tinyprog -p .build/hardware.bin -u .build/software.bin
 	powershell.exe -c \
-	"tinyprog -p \$$env:WSLHome\synthesizer\src\.build\hardware.bin \
-	          -u \$$env:WSLHome\synthesizer\src\.build\software.bin"
+	"tinyprog -p \$$env:WSLHome\my-micon\src\.build\hardware.bin \
+	          -u \$$env:WSLHome\my-micon\src\.build\software.bin"
 
 gen: hardware/hardware.v firmware/firmware.hpp firmware/firmware.cpp
 	micon read -m micon.mcl
