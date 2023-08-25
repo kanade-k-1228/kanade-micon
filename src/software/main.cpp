@@ -1,8 +1,11 @@
 #include "firmware.hpp"
 #include "music/Player.hpp"
+#include "music/cmidi/bigbr.h"
+#include "music/cmidi/makaimura.h"
 #include "music/cmidi/rockman_dr_wily.h"
+#include "music/cmidi/ugoku.h"
 
-Player player(&square1, &square2, &square3, &sawtooth, &triangle);
+Player player(&mixier, &square1, &square2, &square3, &sawtooth, &triangle);
 
 void piano();
 
@@ -18,7 +21,7 @@ void init() {
   sawtooth.set_clk(CLK_FREQ / 256);
   triangle.set_clk(CLK_FREQ / 256 / 2);
   mixier.set_vol(0, 1);
-  mixier.set_vol(1, 1);
+  mixier.set_vol(1, 0);
   mixier.set_vol(2, 1);
   mixier.set_vol(3, 2);
   mixier.set_vol(4, 4);
@@ -41,7 +44,10 @@ void loop() {
               " [b] Blink LED (PWM)\n"
               " [c] Sownd\n"
               " [d] Piano\n"
-              " [e] Play Rockman\n";
+              " [e] Play Music (Rockman)\n"
+              " [f] Play Music (Ugoku)\n"
+              " [g] Play Music (Makaimura)\n"
+              " [h] Play Music (FF)\n";
     serial >> cmd;
     if(cmd == 'a') {
       serial << "=== Blink LED (GPIO) ===\n";
@@ -79,6 +85,31 @@ void loop() {
                 " )  /\\ \\ \n"
                 "(__)  \\_> \n";
       player.music(rockman_dr_wily_music, rockman_dr_wily_len);
+      serial << "=== end ===\n";
+    }
+    if(cmd == 'f') {
+      serial << "=== Play Music ===\n"
+             << " .. (  '-')\n";
+      mixier.set_vol(0, 0);
+      mixier.set_vol(1, 0);
+      mixier.set_vol(2, 0);
+      player.music(ugoku_music, ugoku_len);
+      serial << "=== end ===\n";
+    }
+    if(cmd == 'g') {
+      serial << "=== Play Music ===\n";
+      mixier.set_vol(0, 0);
+      mixier.set_vol(1, 0);
+      mixier.set_vol(2, 0);
+      player.music(makaimura_music, makaimura_len);
+      serial << "=== end ===\n";
+    }
+    if(cmd == 'h') {
+      serial << "=== Play Music ===\n";
+      mixier.set_vol(0, 1);
+      mixier.set_vol(1, 0);
+      mixier.set_vol(2, 0);
+      player.music(bigbr_music, bigbr_len);
       serial << "=== end ===\n";
     }
   }
