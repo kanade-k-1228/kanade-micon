@@ -1,3 +1,5 @@
+gpio := "https://example.com";
+
 cpu.irq5 <= fpga.pin11;
 
 serial = uart(uart,UART);
