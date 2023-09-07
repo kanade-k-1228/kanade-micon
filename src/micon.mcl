@@ -1,4 +1,11 @@
-gpio := "https://example.com";
+cpu  := "https://raw.githubusercontent.com/Next-MICON/packages/main/cpu/cpu.json";
+fpga := "https://raw.githubusercontent.com/Next-MICON/packages/main/fpga/fpga.json";
+
+// IO
+gpio := "https://raw.githubusercontent.com/Next-MICON/packages/main/gpio/gpio.json";
+uart := "https://raw.githubusercontent.com/Next-MICON/packages/main/uart/uart.json";
+pwm := "https://raw.githubusercontent.com/Next-MICON/packages/main/pwm/pwm.json";
+selector := "https://raw.githubusercontent.com/Next-MICON/packages/main/selector/selector.json";
 
 cpu.irq5 <= fpga.pin11;
 
@@ -14,6 +21,11 @@ pwm.out => sel.in1;
 
 sel = selector(selector,Selector);
 sel.out => fpga.user_led;
+
+// 音生成回路
+
+music   := "https://raw.githubusercontent.com/Next-MICON/packages/main/music/music.json";
+counter := "https://raw.githubusercontent.com/Next-MICON/packages/main/counter/counter.json";
 
 square1  = music(osc_square,  Oscilator);
 square2  = music(osc_square,  Oscilator);
