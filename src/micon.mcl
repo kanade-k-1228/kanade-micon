@@ -1,7 +1,8 @@
-cpu  := "https://raw.githubusercontent.com/Next-MICON/packages/main/cpu/cpu.json";
-fpga := "https://raw.githubusercontent.com/Next-MICON/packages/main/fpga/fpga.json";
+# cpu  := "https://raw.githubusercontent.com/Next-MICON/packages/main/cpu/cpu.json";
+# fpga := "https://raw.githubusercontent.com/Next-MICON/packages/main/fpga/fpga.json";
 
-// IO
+# IO
+
 gpio := "https://raw.githubusercontent.com/Next-MICON/packages/main/gpio/gpio.json";
 uart := "https://raw.githubusercontent.com/Next-MICON/packages/main/uart/uart.json";
 pwm := "https://raw.githubusercontent.com/Next-MICON/packages/main/pwm/pwm.json";
@@ -22,7 +23,7 @@ pwm.out => sel.in1;
 sel = selector(selector,Selector);
 sel.out => fpga.user_led;
 
-// 音生成回路
+# 音生成回路
 
 music   := "https://raw.githubusercontent.com/Next-MICON/packages/main/music/music.json";
 counter := "https://raw.githubusercontent.com/Next-MICON/packages/main/counter/counter.json";
