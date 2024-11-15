@@ -1,14 +1,16 @@
-CROSS = riscv64-unknown-elf-
+ARCH = riscv64-unknown-elf-
 SOFTWARE  = .common/*.cpp .packages/*/*.cpp firmware/*.cpp software/*.cpp
 HARDWARE  = .common/*.v   .packages/*/*.v   hardware/hardware.v 
 SIMU_HARD = .common/simulation/*.v simulation/*.v
 SIMU_SOFT = .common/*.cpp .packages/*/*.cpp firmware/*.cpp simulation/*.cpp
 
 upload: hardware software
+# Linux
 #	tinyprog -p .build/hardware.bin -u .build/software.bin
+# Windows
 	powershell.exe -c \
-	"tinyprog -p \$$env:WSLHome\my-micon\src\.build\hardware.bin \
-	          -u \$$env:WSLHome\my-micon\src\.build\software.bin"
+	"tinyprog -p \$$env:WSLHome\kanade-micon\src\.build\hardware.bin \
+	          -u \$$env:WSLHome-micon\src\.build\software.bin"
 
 gen: hardware/hardware.v firmware/firmware.hpp firmware/firmware.cpp
 	micon read -m micon.mcl
@@ -30,27 +32,27 @@ hardware: .build/hardware.bin
 
 software: .build/software.objdump .build/software.nm .build/software.bin
 .build/software.elf: .common/start.S $(SOFTWARE) firmware/firmware.hpp
-	$(CROSS)g++ -march=rv32imc -mabi=ilp32 -nostartfiles \
+	$(ARCH)g++ -march=rv32imc -mabi=ilp32 -nostartfiles \
 	        -Wl,-Bstatic,-T,.common/sections.lds,--strip-debug,-Map=.build/software.map,--cref \
 			-O3 -ffreestanding -nostdlib -I .common -I firmware -I .packages -o $@ $^
 .build/software.objdump: .build/software.elf
-	$(CROSS)objdump --demangle -D $^ > $@
+	$(ARCH)objdump --demangle -D $^ > $@
 .build/software.nm: .build/software.elf
-	$(CROSS)nm --demangle --numeric-sort $^ > $@
+	$(ARCH)nm --demangle --numeric-sort $^ > $@
 .build/software.bin: .build/software.elf
-	$(CROSS)objcopy -O binary $^ /dev/stdout > $@
+	$(ARCH)objcopy -O binary $^ /dev/stdout > $@
 
 .build/simu_software.elf: .common/start.S $(SIMU_SOFT)
-	$(CROSS)g++ -march=rv32imc -mabi=ilp32 -nostartfiles \
+	$(ARCH)g++ -march=rv32imc -mabi=ilp32 -nostartfiles \
 	        -Wl,-Bstatic,-T,.common/sections.lds,--strip-debug,-Map=.build/simu_software.map,--cref \
 			-O3 -ffreestanding -nostdlib -I .common -I firmware -I .packages -o $@ $^ \
 			-DSIMU
 .build/simu_software.objdump: .build/simu_software.elf
-	$(CROSS)objdump --demangle -D $^ > $@
+	$(ARCH)objdump --demangle -D $^ > $@
 .build/simu_software.nm: .build/simu_software.elf
-	$(CROSS)nm --demangle --numeric-sort $^ > $@
+	$(ARCH)nm --demangle --numeric-sort $^ > $@
 .build/simu_software.bin: .build/simu_software.elf
-	$(CROSS)objcopy -O binary $^ $@
+	$(ARCH)objcopy -O binary $^ $@
 .build/simu_software.hex: simu_.build/software.bin
 	xxd $^ > $@
 .build/simu_flash.bin: .build/simu_software.bin

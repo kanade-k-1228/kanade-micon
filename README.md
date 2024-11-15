@@ -1,38 +1,56 @@
 <img src="./img/serial.png" align="right" />
 
-# My MICON
+# Kanade Micon
 
-[Next-MICON micon-generator](https://github.com/Next-MICON/micon-generator) を使用した 32bit RISC-V マイコン。
-
-32bit RISC-V Microcontroller based on [Next-MICON micon-generator](https://github.com/Next-MICON/micon-generator).
+32bit RISC-V Microcontroller using [PicoRV32](https://github.com/YosysHQ/picorv32).
 
 ## Tutorial
 
-### 1. Get FPGA board
+### 1. Install FPGA tools
 
-[TinyFPGA BX](https://www.crowdsupply.com/tinyfpga/tinyfpga-ax-bx)
+Get tools from [oss-cad-suite](https://github.com/YosysHQ/oss-cad-suite-build) release page.
 
-### 2. Install tools
-
-Ubuntu 22.04
-
-```
-$ sudo apt update
-$ sudo apt install -y yosys nextpnr iverilog gtkwave
+```bash
+$ https://github.com/YosysHQ/oss-cad-suite-build/releases/download/[date]/oss-cad-suite-linux-x64-[date].tgz
+$ tar -xvzf oss-cad-suite-linux-x64-[date].tgz
+$ echo 'export PATH=$HOME/oss-cad-suite/bin:$PATH' >> .bashrc
 ```
 
-install micon-generator
+Also install cross-compiler
 
-[Next-MICON/micon-generator](https://github.com/Next-MICON/micon-generator)
+```bash
+$ sudo apt install gcc-riscv64-unknown-elf
+```
+
+### 2. Install micon tools
+
+Install [NextMiconCompiler](https://github.com/NextMicon/NextMiconCompiler)
 
 ### 3. Build and run
 
-```
-$ git clone git@github.com:kanade-k-1228/mysoc.git
-$ cd mysoc/src
+```bash
+$ git clone git@github.com:kanade-k-1228/kanade-micon.git
+$ cd kanade-micon/src
 $ mkdir .build
-$ make
+$ make simu
 ```
+
+### 4. Run on FPGA board
+
+Connect [TinyFPGA BX](https://www.crowdsupply.com/tinyfpga/tinyfpga-ax-bx) and run
+
+```bash
+$ make upload
+```
+
+If it doesn't works, push reset button on the FPGA board and retry.
+
+### Windows
+
+1. Setup above env on WSL
+2. Set `WSLHome=\\wsl.localhost\Ubuntu\home\[username]` on Windows
+3. Install `tinyprog` on Windows
+4. Switch upload script in `src/Makefile`
 
 ## Datasheet
 
