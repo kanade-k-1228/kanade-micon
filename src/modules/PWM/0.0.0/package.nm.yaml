@@ -1,0 +1,13 @@
+ports:
+  - {name: out, type: wire, bit: 1, direct: out, side: right}
+params: []
+software:
+  className: PWM
+  memSize: 0x10
+  methods:
+    - note: Set duty ratio 0~255 (0.0129 = 3.3/256)
+      name: duty
+      type: void
+      args:
+        - type: uint32_t
+          name: val

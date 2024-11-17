@@ -1,0 +1,18 @@
+ports:
+  - {name: ch0, type: wire, bit: 8, direct: in, side: left}
+  - {name: ch1, type: wire, bit: 8, direct: in, side: left}
+  - {name: ch2, type: wire, bit: 8, direct: in, side: left}
+  - {name: ch3, type: wire, bit: 8, direct: in, side: left}
+  - {name: out, type: wire, bit: 12, direct: out, side: right}
+software:
+  className: Mixier
+  memSize: 0x10
+  methods:
+    - note: Set volume (0 ~ 15)
+      name: set_vol
+      type: void
+      args:
+        - type: uint32_t
+          name: ch
+        - type: uint32_t
+          name: vol

@@ -1,73 +1,74 @@
 ARCH = riscv64-unknown-elf-
-SOFTWARE  = .common/*.cpp .packages/*/*.cpp firmware/*.cpp software/*.cpp
-HARDWARE  = .common/*.v   .packages/*/*.v   hardware/hardware.v 
-SIMU_HARD = .common/simulation/*.v simulation/*.v
-SIMU_SOFT = .common/*.cpp .packages/*/*.cpp firmware/*.cpp simulation/*.cpp
+SOFTWARE  = common/*.cpp modules/*/*/*.cpp fw/*.cpp sw/*.cpp
+HARDWARE  = common/*.sv  modules/*/*/*.sv hw/top.sv
+SIMU_HARD = common/simu/*.sv simu/*.sv
+SIMU_SOFT = common/*.cpp modules/*/*/*.cpp fw/*.cpp simu/*.cpp
+NPROC     = $(shell nproc)
 
-upload: hardware software
+upload: hw sw
 # Linux
 #	tinyprog -p .build/hardware.bin -u .build/software.bin
-# Windows
+# Windows with WSL
 	powershell.exe -c \
 	"tinyprog -p \$$env:WSLHome\kanade-micon\src\.build\hardware.bin \
 	          -u \$$env:WSLHome-micon\src\.build\software.bin"
 
-gen: hardware/hardware.v firmware/firmware.hpp firmware/firmware.cpp
-	micon read -m micon.mcl
-hardware/hardware.v: micon.mcl
-	micon gen-hard -t $@ -m $^ -o $@
-firmware/firmware.hpp: micon.mcl
-	micon gen-firm -t $@ -m $^ -o $@
-firmware/firmware.cpp: micon.mcl
-	micon gen-firm -t $@ -m $^ -o $@
+hw: build/hw.bin
+build/hw.bin: $(HARDWARE)
+# Synthesis
+	yosys -ql build/hw.json.log -p 'synth_ice40 -top top -json build/hw.json' $^
+# Place & Route
+	nextpnr-ice40 -ql build/hw.asc.log --threads $(NPROC) \
+		--lp8k --package cm81 --asc build/hw.asc \
+		--pcf common/fpga.pcf --json build/hw.json
+# Timing Analysis
+	icetime -d lp8k -c 12 -mtr build/hw.rpt build/hw.asc
+# Package into a binary file
+	icepack build/hw.asc build/hw.bin
 
-hardware: .build/hardware.bin
-.build/hardware.json: $(HARDWARE)
-	yosys -ql $@.log -p 'synth_ice40 -top hardware -json $@' $^
-.build/hardware.asc: .build/hardware.json
-	nextpnr-ice40 -ql $@.log --lp8k --package cm81 --asc $@ --pcf .common/fpga.pcf --json $^
-.build/hardware.bin: .build/hardware.asc
-	icetime -d lp8k -c 12 -mtr .build/hardware.rpt $^
-	icepack $^ $@
+sw: build/sw.bin
+build/sw.bin: common/start.S $(SOFTWARE)
+# Compile
+	$(ARCH)g++ -march=rv32im -mabi=ilp32 -nostartfiles \
+	        -Wl,-Bstatic,-T,.common/sections.lds,--strip-debug,-Map=build/sw.map,--cref \
+			-O3 -ffreestanding -nostdlib -I common -I fw -I modules -o build/sw.elf $^
+# Object Dump
+	$(ARCH)objdump --demangle -D build/sw.elf > build/sw.objdump
+# Symbol Table
+	$(ARCH)nm --demangle --numeric-sort build/sw.elf > build/sw.nm
+# Generate Binary
+	$(ARCH)objcopy -O binary build/sw.elf /dev/stdout > build/sw.bin
 
-software: .build/software.objdump .build/software.nm .build/software.bin
-.build/software.elf: .common/start.S $(SOFTWARE) firmware/firmware.hpp
-	$(ARCH)g++ -march=rv32imc -mabi=ilp32 -nostartfiles \
-	        -Wl,-Bstatic,-T,.common/sections.lds,--strip-debug,-Map=.build/software.map,--cref \
-			-O3 -ffreestanding -nostdlib -I .common -I firmware -I .packages -o $@ $^
-.build/software.objdump: .build/software.elf
-	$(ARCH)objdump --demangle -D $^ > $@
-.build/software.nm: .build/software.elf
-	$(ARCH)nm --demangle --numeric-sort $^ > $@
-.build/software.bin: .build/software.elf
-	$(ARCH)objcopy -O binary $^ /dev/stdout > $@
-
-.build/simu_software.elf: .common/start.S $(SIMU_SOFT)
-	$(ARCH)g++ -march=rv32imc -mabi=ilp32 -nostartfiles \
-	        -Wl,-Bstatic,-T,.common/sections.lds,--strip-debug,-Map=.build/simu_software.map,--cref \
-			-O3 -ffreestanding -nostdlib -I .common -I firmware -I .packages -o $@ $^ \
+build/simu_flash.hex: common/start.S $(SIMU_SOFT)
+# Compile
+	$(ARCH)g++ -march=rv32im -mabi=ilp32 -nostartfiles \
+	        -Wl,-Bstatic,-T,common/sections.lds,--strip-debug,-Map=build/simu_sw.map,--cref \
+			-O3 -ffreestanding -nostdlib -I common -I fw -I modules -o build/simu_sw.elf $^ \
 			-DSIMU
-.build/simu_software.objdump: .build/simu_software.elf
-	$(ARCH)objdump --demangle -D $^ > $@
-.build/simu_software.nm: .build/simu_software.elf
-	$(ARCH)nm --demangle --numeric-sort $^ > $@
-.build/simu_software.bin: .build/simu_software.elf
-	$(ARCH)objcopy -O binary $^ $@
-.build/simu_software.hex: simu_.build/software.bin
-	xxd $^ > $@
-.build/simu_flash.bin: .build/simu_software.bin
-	.common/simulation/zeropadding.sh $^ > $@
-.build/simu_flash.hex: .build/simu_flash.bin
-	xxd -c 1 -p $^ > $@
-.build/simu_testbench.vvp: .build/simu_flash.hex $(SIMU_HARD) $(HARDWARE)
-	iverilog -g2005-sv -s testbench -o $@ $(SIMU_HARD) $(HARDWARE) \
+# Object Dump
+	$(ARCH)objdump --demangle -D build/simu_sw.elf > build/simu_sw.objdump
+# Symbol Table
+	$(ARCH)nm --demangle --numeric-sort build/simu_sw.elf > build/simu_sw.nm
+# Generate Binary
+	$(ARCH)objcopy -O binary build/simu_sw.elf build/simu_sw.bin
+	xxd build/simu_sw.bin > build/simu_sw.hex
+# Flash binary
+	common/simu/zeropadding.sh build/simu_sw.bin > build/simu_flash.bin
+	xxd -c 1 -p build/simu_flash.bin > build/simu_flash.hex
+
+build/simu.vcd: build/simu_flash.hex $(SIMU_HARD) $(HARDWARE)
+	iverilog -g2005-sv -s tb -o build/simu_tb.vvp $(SIMU_HARD) $(HARDWARE) \
 	         `yosys-config --datdir/ice40/cells_sim.v` \
 			 -DNO_ICE40_DEFAULT_ASSIGNMENTS \
 			 -DDEBUG -DDEBUGNETS -DDEBUGREGS
-.build/simulation.vcd: .build/simu_testbench.vvp
-	vvp $^ > .build/simulation.log
-	.common/simulation/serial.sh .build/simulation.log .build/simu_serial.log
-simu: .build/simulation.vcd .build/simu_software.objdump .build/simu_software.nm
-	gtkwave .build/simulation.vcd
+	vvp build/simu_tb.vvp > build/simu.log
+	common/simu/serial.sh build/simu.log build/simu_serial.log
 
-.PHONY: upload gen hardware software simu
+#	verilator --cc --exe --build -j 8 --trace -DSIMULATION \
+				-Icommon -Imodules -Ifw -I. -o $@ --timing \
+				$(SIMU_HARD) $(HARDWARE) ~/oss-cad-suite/share/yosys/ice40/cells_sim.v
+
+simu: build/simu.vcd
+	gtkwave build/simu.vcd
+
+.PHONY: upload hw sw simu

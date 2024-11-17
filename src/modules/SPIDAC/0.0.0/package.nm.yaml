@@ -1,0 +1,26 @@
+ports:
+  - {name: in, type: wire, bit: 12, direct: in, side: left}
+  - {name: sample, type: wire, bit: 1, direct: in, side: left}
+  - {name: cs, type: wire, bit: 1, direct: out, side: right}
+  - {name: scl, type: wire, bit: 1, direct: out, side: right}
+  - {name: sdi, type: wire, bit: 1, direct: out, side: right}
+  - {name: ldac, type: wire, bit: 1, direct: out, side: right}
+software:
+  className: SPIDAC
+  memSize: 0x10
+  methods:
+    - note: Analog to Digital Converter
+      name: analog
+      type: void
+      args:
+        - type: uint16_t
+          name: value
+        - type: int
+          name: buf
+          default: 1
+        - type: int
+          name: ga
+          default: 1
+        - type: int
+          name: shdn
+          default: 1

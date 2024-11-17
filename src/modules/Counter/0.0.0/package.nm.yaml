@@ -1,0 +1,37 @@
+ports:
+  - {name: of, type: wire, bit: 1, direct: out, side: right}
+params: []
+software:
+  className: Prescaler
+  memSize: 0x10
+  methods:
+    - note: Set counter
+      name: set
+      type: void
+      args:
+        - type: uint32_t
+          name: cnt
+    - note: Set counter by second
+      name: set_sec
+      type: void
+      args:
+        - type: uint32_t
+          name: sec
+    - note: Set counter by mili second
+      name: set_ms
+      type: void
+      args:
+        - type: uint32_t
+          name: ms
+    - note: Sec counter by micro second
+      name: set_us
+      type: void
+      args:
+        - type: uint32_t
+          name: us
+    - note: Set conter by frequence [Hz]
+      name: set_hz
+      type: void
+      args:
+        - type: uint32_t
+          name: f

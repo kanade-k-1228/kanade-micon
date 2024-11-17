@@ -1,0 +1,16 @@
+ports:
+  - {name: out, type: wire, bit: 8, direct: out, side: right}
+software:
+  className: Square
+  memSize: 0x10
+  methods:
+    - note: Start oscilating
+      name: freq
+      type: void
+      args:
+        - type: uint32_t
+          name: f
+    - note: Stop oscilating
+      name: stop
+      type: void
+      args: []

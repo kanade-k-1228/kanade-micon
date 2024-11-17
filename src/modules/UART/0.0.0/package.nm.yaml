@@ -1,0 +1,54 @@
+ports:
+  - {name: rx, type: wire, bit: 1, direct: in, side: right}
+  - {name: tx, type: wire, bit: 1, direct: out, side: right}
+params: []
+software:
+  className: UART
+  memSize: 0x10
+  methods:
+    - note: Set Baudrate
+      name: baud
+      type: Serial&
+      args:
+        - type: uint32_t
+          name: baudrate
+    - note: Print Char
+      name: print
+      type: Serial&
+      args:
+        - type: char
+          name: c
+    - note: Print String
+      name: print
+      type: Serial&
+      args:
+        - type: const char*
+          name: str
+    - note: Print integer in hexadecimal
+      name: hex
+      type: Serial&
+      args:
+        - type: uint32_t
+          name: num
+        - type: uint32_t
+          name: digits
+    - note: Print integer in decimal
+      name: dec
+      type: Serial&
+      args:
+        - type: uint32_t
+          name: num
+    - note: Receive synchronous
+      name: receive
+      type: uint32_t
+      args: []
+    - note: Receive with timeout (us)
+      name: receive
+      type: uint32_t
+      args:
+        - type: uint32_t
+          name: timeout
+    - note: Receive as a integer
+      name: receive_int
+      type: uint32_t
+      args: []
